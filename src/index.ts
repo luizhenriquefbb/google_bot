@@ -24,7 +24,7 @@ async function main(string:string, numberOfImages:number) {
     await driver.wait(until.titleContains('Pesquisa Google'), 2000);
 
     // change to image's tab
-    const imageSearchButton = By.css('#hdtb-msb-vis > div:nth-child(3) > a');
+    const imageSearchButton = By.css('#hdtb-msb-vis > div:nth-child(2) > a');
     await driver.wait(until.elementLocated(imageSearchButton), 2000);
     await (await driver.findElement(imageSearchButton)).click();
 
@@ -53,7 +53,15 @@ async function main(string:string, numberOfImages:number) {
     for (const index in images.slice(0, numberOfImages)) {
         const image = images[index];
         const imageName = `image-${parseInt(index)+1}.png`;
-        const imageSrc = await image.getAttribute("src");
+
+        // find the <a> tag to find the image with original size
+        const a_link = await image.findElement(By.xpath("./.."));
+        await a_link.click();
+
+        await sleep(3000);
+
+        const biggerImage = await driver.findElement(By.css("div.tvh9oe:nth-child(2) > c-wiz:nth-child(1) > div:nth-child(1) > div:nth-child(1) > div:nth-child(1) > div:nth-child(2) > a:nth-child(1) > img:nth-child(1)"));
+        const imageSrc = await (biggerImage).getAttribute("src");
         if (imageSrc) {
             imagesData.push(imageSrc);
             download(imageSrc, `images/${imageName}`, () => {});
